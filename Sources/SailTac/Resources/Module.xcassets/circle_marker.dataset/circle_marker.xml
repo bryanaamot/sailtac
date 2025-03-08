@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="oval">
+    <!-- Orange fill with 30% opacity -->
+    <solid android:color="#4DFFA500" /> <!-- 4D (30% opacity) + FFA500 (Orange) -->
+    
+    <!-- Orange stroke with 4dp width -->
+    <stroke android:width="4dp" android:color="#FFA500" />
+
+    <!-- Define size -->
+    <size android:width="96dp" android:height="96dp" />
+</shape>

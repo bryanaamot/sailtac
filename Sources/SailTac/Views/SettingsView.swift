@@ -10,7 +10,6 @@ import SwiftUI
 
 struct SettingsView: View {
     @AppStorage("name") var name = "Skipper"
-    @State var appearance = ""
     @EnvironmentObject var appData: AppData
     @State var showProgressView = false
     @State var errorMessage = ""
@@ -19,6 +18,8 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 Text("Heading: \(Int(round(appData.heading)))º")
+                Text("Position: \(appData.location.lat)º, \(appData.location.lon)º")
+
 //                HStack {
 //                    Spacer()
 //                    Button(action: {
@@ -65,7 +66,7 @@ struct SettingsView: View {
                 }
 
                 TextField("Name", text: $name)
-                Picker("Appearance", selection: $appearance) {
+                Picker("Appearance", selection: $appData.appearance) {
                     Text("System").tag("")
                     Text("Light").tag("light")
                     Text("Dark").tag("dark")
@@ -84,6 +85,5 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
         }
-        .preferredColorScheme(appearance == "dark" ? .dark : appearance == "light" ? .light : nil)
     }
 }

@@ -8,23 +8,6 @@
 
 import SwiftUI
 
-let useLocalServer = true
-
-#if !SKIP
-let iPad = UIDevice.current.userInterfaceIdiom == .pad
-#else
-let iPad = false // UIDevice.current.userInterfaceIdiom == .pad
-#endif
-
-// see: https://developer.android.com/studio/run/emulator-networking
-#if !SKIP
-let endPoint =  useLocalServer ? "http://localhost:8080" : "https://services.sailtac.com"
-let websocketEndpoint = useLocalServer ? "ws://localhost:8080" : "wss://services.sailtac.com"
-#else
-let endPoint =  useLocalServer ? "http://10.0.2.2:8080" : "https://services.sailtac.com"
-let websocketEndpoint = useLocalServer ? "ws://localhost:8080" : "wss://services.sailtac.com"
-#endif
-
 // Defines the event types handled by EventQueueManager<EventType>
 enum EventType: String, EventTypeProtocol {
     case updateCourse = "UpdateCourse"
@@ -203,6 +186,7 @@ class AppData: NSObject, ObservableObject {
             UserDefaults.standard.set(unitLength2.symbol, forKey: "unitLength2")
         }
     }
+    @AppStorage("appearance") var appearance = ""
     @AppStorage("name") var name = ""
     static let boatLength = 6.0
     
@@ -578,7 +562,9 @@ extension AppData {
         request.httpBody = jsonData
         
         let (data, _) = try await URLSession.shared.data(for: request)
-        let newCourse = try JSONDecoder().decode(Course.self, from: data)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let newCourse = try decoder.decode(Course.self, from: data)
         return newCourse
     }
     

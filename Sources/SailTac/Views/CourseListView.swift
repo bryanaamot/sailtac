@@ -44,7 +44,9 @@ struct CourseListView: View {
             }
             List {
                 ForEach(sortedCourses) { course in
-                    NavigationLink(destination: CourseMapView(courseID: course.id, wind: course.wind, marks: course.marks)) {
+                    NavigationLink(destination: LazyView {
+                        CourseMapView(courseID: course.id, wind: course.wind, marks: course.marks, location: appData.location)
+                    }) {
                         VStack(alignment: .leading) {
                             Text("\(course.name)")
                                 .font(.headline)
@@ -132,6 +134,16 @@ struct CourseListView: View {
                 }
             }
         }
+    }
+}
+
+struct LazyView<Content: View>: View {
+    let build: () -> Content
+    init(_ build: @escaping () -> Content) {
+        self.build = build
+    }
+    var body: some View {
+        build()
     }
 }
 

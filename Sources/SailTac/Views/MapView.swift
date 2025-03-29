@@ -23,7 +23,7 @@ struct MapView : View {
     var finishedDragging: (() -> Void)
     @State var errorString = ""
     @EnvironmentObject private var appData: AppData
-    @State private var position: MapCameraPosition
+    @State private var mapCameraPosition: MapCameraPosition
     
     init(mapType: Binding<MyMapType>, wind: Binding<Double>, marks: Binding<[Mark]>, latitude: Binding<Double>, longitude: Binding<Double>, showEditMark: Binding<Bool>, editMarkIndex: Binding<Int>, showMoveDetails: Binding<Bool>, moveDetails: Binding<String>, finishedDragging: @escaping () -> Void) {
         _mapType = mapType
@@ -36,7 +36,7 @@ struct MapView : View {
         _showMoveDetails = showMoveDetails
         _moveDetails = moveDetails
         self.finishedDragging = finishedDragging
-        self.position = .region(.init(center: CLLocationCoordinate2D(latitude: latitude.wrappedValue, longitude: longitude.wrappedValue), latitudinalMeters: 10000.0, longitudinalMeters: 10000.0))
+        mapCameraPosition = .region(.init(center: CLLocationCoordinate2D(latitude: latitude.wrappedValue, longitude: longitude.wrappedValue), latitudinalMeters: 10000.0, longitudinalMeters: 10000.0))
     }
     
     static func convertToCLLocationCoordinate2D(_ latLonArray: [[LatLon]]) -> [[CLLocationCoordinate2D]] {
@@ -89,7 +89,7 @@ struct MapView : View {
                     .foregroundStyle(Color.red)
             }
             MapReader { mapProxy in
-                Map(position: $position) {
+                Map(position: $mapCameraPosition) {
                     // Draw lines under marks
                     let latLonArray = Bearing.lines(wind: wind, marks: marks)
                     let lines = Self.convertToCLLocationCoordinate2D(latLonArray)
@@ -139,6 +139,10 @@ struct MapView : View {
                         }
                     }
                 }
+                .mapControls {
+                    MapUserLocationButton()
+                    MapScaleView()
+                }
                 .mapStyle(
                     mapType == .standard ? .standard(elevation: .realistic, emphasis: .automatic) :
                     mapType == .satellite ? .imagery :
@@ -147,13 +151,31 @@ struct MapView : View {
                     latitude = context.region.center.latitude
                     longitude = context.region.center.longitude
                 }
+//                .onChange(of: latitude) { oldLat, newLat in
+//                    updateMapCenter(lat: newLat)
+//                }
+//                .onChange(of: longitude) { oldLon, newLon in
+//                    updateMapCenter(lon: newLon)
+//                }
             }
         } else {
             Text("Map requires iOS 17")
                 .font(.title)
         }
     }
+    
+//    func updateMapCenter(lat: Double = 0.0, lon: Double = 0.0) {
+//        if abs(lat) > 1E-05 || abs(lon) > 1E-05 {
+//            let point = CLLocationCoordinate2D(
+//                latitude: lat != 0 ? lat : latitude,
+//                longitude: lon != 0 ? lon : longitude)
+//            let span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+//            mapCameraPosition = .region(
+//                .init(center: point, span: span))
+//        }
+//    }
 }
+
 
 @available(iOS 17.0, *)
 struct MarkAnnotation: View {

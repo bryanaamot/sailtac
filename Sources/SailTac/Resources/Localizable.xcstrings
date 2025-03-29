@@ -342,6 +342,16 @@
     "Port Distance" : {
 
     },
+    "Position: %lfº, %lfº" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Position: %1$lfº, %2$lfº"
+          }
+        }
+      }
+    },
     "Powered by %@" : {
       "localizations" : {
         "es" : {

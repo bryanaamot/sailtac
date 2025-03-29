@@ -2,6 +2,24 @@ import Foundation
 import OSLog
 import SwiftUI
 
+let useLocalServer = true
+
+#if !SKIP
+let iPad = UIDevice.current.userInterfaceIdiom == .pad
+#else
+let iPad = false // UIDevice.current.userInterfaceIdiom == .pad
+#endif
+
+// see: https://developer.android.com/studio/run/emulator-networking
+#if !SKIP
+let endPoint =  useLocalServer ? "http://localhost:8080" : "https://services.sailtac.com"
+let websocketEndpoint = useLocalServer ? "ws://localhost:8080" : "wss://services.sailtac.com"
+#else
+let endPoint =  useLocalServer ? "http://10.0.2.2:8080" : "https://services.sailtac.com"
+let websocketEndpoint = useLocalServer ? "ws://localhost:8080" : "wss://services.sailtac.com"
+#endif
+
+
 let logger: Logger = Logger(subsystem: "net.brainware.sailtac", category: "SailTac")
 
 /// The Android SDK number we are running against, or `nil` if not running on Android
@@ -21,6 +39,9 @@ public struct RootView : View {
             .task {
                 logger.log("Welcome to Skip on \(androidSDK != nil ? "Android" : "Darwin")!")
                 logger.warning("Skip app logs are viewable in the Xcode console for iOS; Android logs can be viewed in Studio or using adb logcat")
+                #if !SKIP
+                UIScreen.main.brightness = 1.0
+                #endif
             }
             .onOpenURL { url in
                 handleUniversalLink(url: url)

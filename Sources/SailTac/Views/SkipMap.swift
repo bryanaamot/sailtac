@@ -64,7 +64,6 @@ public struct Annotation<Content> : View where Content : View {
 
 public struct Map<Content> : View where Content: View {
     @Binding var mapCameraPosition: MapCameraPosition
-    var bounds: MapCameraBounds?
     var interactionModes: MapInteractionModes
     
     let content: () -> Content

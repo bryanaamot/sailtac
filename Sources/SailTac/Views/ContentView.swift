@@ -3,7 +3,6 @@ import SwiftUI
 public struct ContentView: View {
     @AppStorage("tab") var tab = Tab.signin
     @AppStorage("name") var name = "Skipper"
-    @State var appearance = ""
     @State var isBeating = false
     @EnvironmentObject var appData: AppData
     @State var isSheetPresented = false
@@ -32,7 +31,7 @@ public struct ContentView: View {
                 .tabItem { Label("Settings", systemImage: "gearshape.fill") }
                 .tag(Tab.settings)
         }
-        .preferredColorScheme(appearance == "dark" ? .dark : appearance == "light" ? .light : nil)
+        .preferredColorScheme(appData.appearance == "dark" ? .dark : appData.appearance == "light" ? .light : nil)
 //        .tint(.red)
     }
 }

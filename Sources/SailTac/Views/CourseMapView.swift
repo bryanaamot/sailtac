@@ -53,18 +53,17 @@ struct CourseMapView: View {
     
     @State var mapType: MyMapType = .standard
     
-    init(courseID: String, wind: Double, marks: [Mark]) {
+    init(courseID: String, wind: Double, marks: [Mark], location: LatLon) {
         self.courseID = courseID
         self.wind = wind
         self.marks = marks
-        // load map center
         if let bounds = Self.boundingBox(for: marks) {
-            logger.debug("bounds = \((bounds.maxLatitude + bounds.minLatitude) / 2.0)")
+//            logger.debug("bounds = \((bounds.maxLatitude + bounds.minLatitude) / 2.0)")
             self.mapCenterLatitude = (bounds.maxLatitude + bounds.minLatitude) / 2.0
             self.mapCenterLongitude = (bounds.maxLongitude + bounds.minLongitude) / 2.0
         } else {
-            self.mapCenterLatitude = 0.0
-            self.mapCenterLongitude = 0.0
+            self.mapCenterLatitude = location.lat
+            self.mapCenterLongitude = location.lon
         }
     }
     
@@ -189,6 +188,9 @@ struct CourseMapView: View {
                             MapButton(action: {
                                 appData.webSocketJoin(courseID: courseID)
                                 startSendingLocation()
+                                // also reset the map location
+                                mapCenterLatitude = appData.location.lat
+                                mapCenterLongitude = appData.location.lon
                             }) {
                                 Text("Share Location")
                             }
@@ -207,6 +209,12 @@ struct CourseMapView: View {
                         }) {
                             Text("\(Int(wind))º")
                         }
+                        MapButton(action: {
+                            showAddMark = true
+                        }) {
+                            Text("Add Mark")
+                        }
+                        
                     }
                     .padding(.vertical)
                 }
@@ -246,12 +254,12 @@ struct CourseMapView: View {
                         }
                         .pickerStyle(.menu)
                         
-                        Button(action: {
-                            showAddMark = true
-                        }) {
-                            Image(systemName: "plus")
-                                .font(.title2)
-                        }
+//                        Button(action: {
+//                            showAddMark = true
+//                        }) {
+//                            Image(systemName: "plus")
+//                                .font(.title2)
+//                        }
                     }
                 }
             }
@@ -295,12 +303,16 @@ struct CourseMapView: View {
                                 $mapCenterLatitude, mapCenterLongitude: $mapCenterLongitude)
             }
             .sheet(isPresented: $showEditCourse) {
-                if var course = appData.courses.first(where: {$0.id == courseID}) {
+                if let course = appData.courses.first(where: {$0.id == courseID}) {
                     CourseEditView(course: course)
                 }
             }
             .onAppear {
                 lastWind = wind
+                if abs(mapCenterLatitude) < 1.0E-10, abs(mapCenterLongitude) < 1.0E-10 {
+                    mapCenterLatitude = appData.location.lat
+                    mapCenterLongitude = appData.location.lon
+                }
             }
             .onChange(of: appData.coursesLastUpdated) {
                 if let course = appData.courses.first(where: { $0.id == courseID }) {
@@ -309,6 +321,13 @@ struct CourseMapView: View {
                     self.marks = course.marks
                     self.wind = course.wind
                     lastWind = wind
+                }
+            }
+            .onChange(of: appData.location) { oldLocation, newLocation in
+                let isSharing = appData.joinedCourses.contains(courseID)
+                if isSharing {
+                    mapCenterLatitude = appData.location.lat
+                    mapCenterLongitude = appData.location.lon
                 }
             }
         }

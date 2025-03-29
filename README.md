@@ -4,9 +4,10 @@
 
 ## Medium Priority
 - Add Lat/Lon to remaining clubs
-- Add velocity when sending location
 
 ## Low Priority
+- Return brightness to original setting when exiting app
+- Add velocity when sending location
 - Search course by name
 - Add status field to club: new, approved, removed
 - Allow users to share "new" clubs as they are waiting to be approved
@@ -14,6 +15,7 @@
 - Add Gate
 
 ## Completed
+- Fixed "The data couldn't be read because it isn't in the correct format." after adding a new course.
 - Improve visibility of "Search by club name" on clubs screen.
 - Add an "X" to slide-up screens
 - Add Delete Course option
